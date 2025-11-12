@@ -10,6 +10,7 @@ const fs = require('fs')
 
 const configLoader = require('../lib/config')
 const kms = require('../lib/kms')
+const { setEnv } = require('./test-helper')
 
 suite('config', () => {
   afterEach(() => {
@@ -47,6 +48,26 @@ suite('config', () => {
   })
 
   suite('loadConfig', () => {
+    test('throws error if env name not given/found', async () => {
+      assert.throws(() => configLoader.loadConfig(), { message: 'loadConfig requires an environment name (or ENVIRONMENT=...)' })
+    })
+
+    test('accepts process.env.ENVIRONMENT when no envName given', async () => {
+      mock.method(configLoader, '_readAndParseConfig', () => {
+        return { plaintext: { k1: 'v1' } }
+      })
+
+      await new Promise((resolve, reject) => {
+        // Temporarily set ENVIRONMENT to some value:
+        setEnv({ ENVIRONMENT: 'some-env' }, async () => {
+          const config = await configLoader.loadConfig()
+
+          assert.deepStrictEqual(config, { k1: 'v1' })
+          resolve()
+        })
+      })
+    })
+
     test('loads plaintext vars', async () => {
       mock.method(configLoader, '_readAndParseConfig', () => {
         return {
@@ -105,7 +126,7 @@ suite('config', () => {
       // Assert getConfig raises error if called before loadConfig has been called:
       assert.throws(() => configLoader.getConfig())
 
-      configLoader.loadConfig()
+      configLoader.loadConfig('env..')
 
       // Calling getConfig immediately after calling loadConfig will fail
       // because the config hasn't yet resolved:

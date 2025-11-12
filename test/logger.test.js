@@ -4,7 +4,7 @@ const {
   test
 } = require('node:test')
 
-const { setEnv, captureStdout } = require('./test-helper.js')
+const { setEnv, captureStdout } = require('./test-helper')
 const logger = require('../lib/logger')
 
 suite('logger', () => {
