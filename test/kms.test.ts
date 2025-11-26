@@ -1,14 +1,14 @@
-const assert = require('node:assert')
-const {
+import assert from 'node:assert'
+import {
   beforeEach,
   afterEach,
   suite,
   test,
   mock
-} = require('node:test')
-const { KMSClient } = require('@aws-sdk/client-kms')
+} from 'node:test'
+import { KMSClient } from '@aws-sdk/client-kms'
 
-const kms = require('../lib/kms')
+import * as kms from '../src/kms'
 
 suite('kms', () => {
   afterEach(() => {

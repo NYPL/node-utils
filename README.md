@@ -21,6 +21,7 @@ As a convenience, after initialization (via above) you may use this function to 
 
 ```
 const { config } = require('@nypl/node-utils')
+// or import { config } from '@nypl/node-utils'
 
 const init = async () => {
   // Destructure the variables you want from the initial loadConfig call:
@@ -70,6 +71,7 @@ To simply change the log level:
 
 ```
 const { logger, config } = require('@nypl/node-utils')
+// or import { logger, config } from '@nypl/node-utils'
 
 const init = () => {
   await config.loadConfig()

@@ -1,5 +1,4 @@
-const { KMSClient, DecryptCommand } = require('@aws-sdk/client-kms')
-const logger = require('./logger')
+import { KMSClient, DecryptCommand } from '@aws-sdk/client-kms'
 
 class KmsError extends Error {}
 
@@ -9,9 +8,9 @@ const kms = {}
  *  Given an array of encrypted strings, resolves an array of decrypted strings
  *  in the same order
  * */
-kms._decryptArray = (encrypted) => {
+export const _decryptArray = (encrypted: string[]): Promise<string[]> => {
   return Promise.all(
-    encrypted.map((encrypted) => kms._decryptString(encrypted))
+    encrypted.map((encrypted) => _decryptString(encrypted))
   )
 }
 
@@ -19,11 +18,11 @@ kms._decryptArray = (encrypted) => {
  *  Given an object with encrypted values, returns an object with the same keys
  *  and decrypted values
  * */
-kms._decryptObject = async (encrypted) => {
+export const _decryptObject = async (encrypted: object) => {
   const pairs = await Promise.all(
     Object.entries(encrypted)
       .map(([key, value]) => {
-        return kms._decryptString(value).then((decrypted) => [key, decrypted])
+        return _decryptString(value).then((decrypted) => [key, decrypted])
       })
   )
 
@@ -34,7 +33,7 @@ kms._decryptObject = async (encrypted) => {
 /**
  *  Given an encrypted string, returns the decrypted string.
  * */
-kms._decryptString = async (encrypted) => {
+export const _decryptString = async (encrypted: string) => {
   let client
   let response
   const config = {
@@ -50,7 +49,7 @@ kms._decryptString = async (encrypted) => {
   })
   try {
     response = await client.send(command)
-  } catch (e) {
+  } catch (e: any) {
     const isCredentialsError = e.name === 'CredentialsProviderError'
     const message = isCredentialsError
       ? `${e.name} error: Try setting AWS_PROFILE=...`
@@ -60,7 +59,7 @@ kms._decryptString = async (encrypted) => {
   if (!response?.Plaintext) {
     throw new KmsError('Invalid KMS response')
   }
-  const decoded = Buffer.from(response.Plaintext, 'binary')
+  const decoded = Buffer.from(response.Plaintext as any, 'binary')
     .toString('utf8')
   return decoded
 }
@@ -71,16 +70,14 @@ kms._decryptString = async (encrypted) => {
  *
  *  @param {(string|string[]|object)} encrypted
  * **/
-kms.decrypt = (encrypted) => {
+export const decrypt = (encrypted: (string|string[]|object)) => {
   if (Array.isArray(encrypted)) {
-    return kms._decryptArray(encrypted)
+    return _decryptArray(encrypted)
   } else if (typeof encrypted === 'object') {
-    return kms._decryptObject(encrypted)
+    return _decryptObject(encrypted)
   } else if (typeof encrypted === 'string') {
-    return kms._decryptString(encrypted)
+    return _decryptString(encrypted)
   } else {
-    throw new KmsError(`decryptAll expected string|object|array; got ${typeof arrayOrHash}`)
+    throw new KmsError(`decryptAll expected string|object|array; got ${typeof encrypted}`)
   }
 }
-
-module.exports = kms

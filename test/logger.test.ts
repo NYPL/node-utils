@@ -1,11 +1,11 @@
-const assert = require('node:assert')
-const {
+import assert from 'node:assert'
+import {
   suite,
   test
-} = require('node:test')
+} from 'node:test'
 
-const { setEnv, captureStdout } = require('./test-helper')
-const logger = require('../lib/logger')
+import { setEnv, captureStdout } from './test-helper'
+import logger from '../src/logger'
 
 suite('logger', () => {
   suite('info', () => {

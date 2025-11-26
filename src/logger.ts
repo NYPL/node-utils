@@ -1,4 +1,15 @@
-const winston = require('winston')
+import winston from 'winston'
+
+type NyplLogger = winston.Logger & {
+  initialize: Function,
+  setFormat: Function,
+  setLevel: Function
+}
+
+interface LoggerConfig {
+  json: boolean,
+  level: string
+}
 
 /**
  *  Get default config based on env vars:
@@ -17,10 +28,11 @@ const defaultConfig = () => {
 // Initialize config based on env vars at runtime:
 let _config = defaultConfig()
 
+
 // Createe logger instance:
-const logger = winston.createLogger({
+const logger: NyplLogger = winston.createLogger({
   level: _config.level
-})
+}) as NyplLogger
 
 /**
  *  (Re-)initialize based on env vars:
@@ -35,8 +47,9 @@ logger.initialize = (config = {}) => {
 /**
  *  Reset format based on config
  * */
-logger.setFormat = (config) => {
-  if (logger.transports.length) {
+logger.setFormat = (config: LoggerConfig) => {
+  const l = logger as winston.Logger
+  if (l.transports.length) {
     logger.remove(logger.transports[0])
   }
 
@@ -57,11 +70,11 @@ logger.setFormat = (config) => {
  *
  *  @param {string} level - One of error, warn, info, debug
  */
-logger.setLevel = (level) => {
+logger.setLevel = (level: string) => {
   logger.level = level
 }
 
 // Initialize logger based on env vars at runtime:
 logger.initialize()
 
-module.exports = logger
+export default logger
