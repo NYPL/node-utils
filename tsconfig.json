@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "esModuleInterop": true,
+    "target": "ESNext",
+    "module": "Preserve",
+    "moduleResolution": "bundler"
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts"]
+}
