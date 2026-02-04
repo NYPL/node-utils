@@ -4,7 +4,7 @@ import { readFileSync } from 'fs'
 
 import { decrypt } from './kms'
 
-class LoadConfigError extends Error {}
+class LoadConfigError extends Error { }
 
 interface FlatHash {
   [key: string]: string
@@ -40,7 +40,7 @@ class Config {
   fileReader: FileReader
   kmsDecrypter: KmsDecrypter
 
-  constructor (dependencies: ConfigDependencies) {
+  constructor(dependencies: ConfigDependencies) {
     this.fileReader = dependencies.fileReader
     this.kmsDecrypter = dependencies.kmsDecrypter
   }
@@ -50,7 +50,7 @@ class Config {
    *
    *  @return {FlatHash}
    * **/
-  _readAndParseConfig (envName: string): ReadConfig {
+  _readAndParseConfig(envName: string): ReadConfig {
     if (!envName) {
       throw new LoadConfigError('Error loading config: No envName given')
     }
@@ -71,24 +71,67 @@ class Config {
     }
 
     const config: FlatHash = {}
-    ;['PLAINTEXT_VARIABLES', 'ENCRYPTED_VARIABLES'].forEach((key) => {
-      if (parsed[key]) {
-        assert(typeof parsed[key] === 'object', `${key} must define an object`)
+      ;['PLAINTEXT_VARIABLES', 'ENCRYPTED_VARIABLES'].forEach((key) => {
+        if (parsed[key]) {
+          assert(typeof parsed[key] === 'object', `${key} must define an object`)
 
-        const name = key.split('_')[0].toLowerCase()
-        config[name] = parsed[key]
-      }
-    })
+          const name = key.split('_')[0].toLowerCase()
+          config[name] = parsed[key]
+        }
+      })
 
     return config
   }
+
+  /**
+   *  Load config from an object instead of reading YAML.
+   *
+   *  @param configObj - same structure as YAML:
+   *      {
+   *        PLAINTEXT_VARIABLES: { ... },
+   *        ENCRYPTED_VARIABLES: { ... }
+   *      }
+   * @return {Promise<object>} An object with all decrypted config
+   */
+  async loadConfigFromObject(configObj?: {
+    PLAINTEXT_VARIABLES?: FlatHash
+    ENCRYPTED_VARIABLES?: FlatHash
+  }): Promise<FlatHash> {
+    if (!configObj) {
+      throw new Error('loadConfigFromObject requires a config object')
+    }
+
+    const plaintext = configObj.PLAINTEXT_VARIABLES
+    const encrypted = configObj.ENCRYPTED_VARIABLES
+
+    if (plaintext && typeof plaintext !== 'object') {
+      throw new Error('PLAINTEXT_VARIABLES must define an object')
+    }
+
+    if (encrypted && typeof encrypted !== 'object') {
+      throw new Error('ENCRYPTED_VARIABLES must define an object')
+    }
+
+    let finalConfig: FlatHash
+    if (encrypted) {
+      finalConfig = { ...(plaintext || {}), ...(await this.kmsDecrypter(encrypted)) }
+    } else {
+      finalConfig = { ...(plaintext || {}) }
+    }
+
+    this._config = finalConfig
+    this._configPromise = Promise.resolve(finalConfig)
+
+    return finalConfig
+  }
+
 
   /**
    *  Load named config, decrypting as necessary
    *
    *  @return {Promise<object>} An object with all decrypted config
    * **/
-  loadConfig (envName = process.env.ENVIRONMENT): Promise<FlatHash> {
+  loadConfig(envName = process.env.ENVIRONMENT): Promise<FlatHash> {
     if (!envName) {
       throw new LoadConfigError('loadConfig requires an environment name (or ENVIRONMENT=...)')
     }
@@ -124,7 +167,7 @@ class Config {
    *  @return {object} config
    *  @throw {LoadConfigError} if config not fully loaded yet.
    * **/
-  getConfig () {
+  getConfig() {
     if (!this._config) {
       throw new LoadConfigError('Attempted to read config before initialized')
     }
