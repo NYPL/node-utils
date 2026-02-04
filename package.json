@@ -12,7 +12,7 @@
   "scripts": {
     "build": "rollup -c && npm run build:types",
     "build:types": "tsc -p tsconfig.declarations.json",
-    "test": "node --experimental-test-module-mocks --import tsx --test test/**.test.ts"
+    "test": "node --import tsx --test test/**.test.ts"
   },
   "keywords": [],
   "author": "@nonword",

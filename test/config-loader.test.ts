@@ -157,7 +157,7 @@ suite('config', async () => {
       assert.deepStrictEqual(config.getConfig(), { secret: 'foo decrypted' })
     })
 
-    test('loads mix of plaintext and encrypted vars', async () => {
+    test('loads mix of plaintext, encrypted vars', async () => {
       config = factory({
         kmsDecrypter: () =>
           Promise.resolve({ e: 'foo decrypted' })
