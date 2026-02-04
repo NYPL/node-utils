@@ -1,8 +1,5 @@
 {
   "name": "@nypl/node-utils",
-  "bin": {
-    "nypl-load-config": "./bin/load-config.js"
-  },
   "version": "1.0.0",
   "description": "A collection of common utilities for NYPL Node apps",
   "repository": {
