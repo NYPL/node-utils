@@ -2,7 +2,7 @@
 
 ## [1.0.1] 2026-02-05
 
- - Add support for `config.loadConfigFromObject`
+ - Add `config.loadConfigFromObject`
 
 ## [1.0.0] 2025-12-15
 
