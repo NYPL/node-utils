@@ -93,15 +93,19 @@ class Config {
    *      }
    * @return {Promise<object>} An object with all decrypted config
    */
-  async loadConfigFromObject(configObj?: {
+  loadConfigFromObject(configObj?: {
     PLAINTEXT_VARIABLES?: FlatHash
     ENCRYPTED_VARIABLES?: FlatHash
   }): Promise<FlatHash> {
-    if (!configObj) {
-      throw new Error('loadConfigFromObject requires a config object')
+    if (this._configPromise) {
+      return this._configPromise
     }
 
-    const plaintext = configObj.PLAINTEXT_VARIABLES
+    if (!configObj) {
+      throw new Error("requires config object")
+    }
+
+    const plaintext = configObj.PLAINTEXT_VARIABLES || {}
     const encrypted = configObj.ENCRYPTED_VARIABLES
 
     if (plaintext && typeof plaintext !== 'object') {
@@ -112,18 +116,21 @@ class Config {
       throw new Error('ENCRYPTED_VARIABLES must define an object')
     }
 
-    let finalConfig: FlatHash
     if (encrypted) {
-      finalConfig = { ...(plaintext || {}), ...(await this.kmsDecrypter(encrypted)) }
+      this._configPromise = this.kmsDecrypter(encrypted)
+        .then((decrypted) => ({ ...plaintext, ...decrypted }))
     } else {
-      finalConfig = { ...(plaintext || {}) }
+      this._configPromise = Promise.resolve(plaintext)
     }
 
-    this._config = finalConfig
-    this._configPromise = Promise.resolve(finalConfig)
+    this._configPromise = (this._configPromise as Promise<FlatHash>).then((c) => {
+      this._config = c
+      return c
+    })
 
-    return finalConfig
+    return this._configPromise
   }
+
 
 
   /**
