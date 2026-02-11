@@ -6,10 +6,6 @@ import {
   test,
   mock
 } from 'node:test'
-
-import * as fs from 'fs'
-
-import * as kms from '../src/kms'
 import { factory } from '../src/config'
 
 import { setEnv } from './test-helper'
@@ -119,6 +115,83 @@ suite('config', async () => {
 
       const c = await config.loadConfig('some-env')
       assert.deepStrictEqual(c, { k1: 'v1', k2: 'v2 decrypted' })
+    })
+  })
+
+  suite('loadConfigFromObject', () => {
+    let config = factory()
+
+    beforeEach(() => {
+      config = factory()
+    })
+
+    test('loads plaintext vars only', async () => {
+      const obj = {
+        PLAINTEXT_VARIABLES: {
+          a: '1',
+          b: '2'
+        }
+      }
+
+      const result = await config.loadConfigFromObject(obj)
+
+      assert.deepStrictEqual(result, { a: '1', b: '2' })
+      assert.deepStrictEqual(config.getConfig(), { a: '1', b: '2' })
+    })
+
+    test('loads encrypted vars only', async () => {
+      config = factory({
+        kmsDecrypter: () =>
+          Promise.resolve({ secret: 'foo decrypted' })
+      })
+
+      const obj = {
+        ENCRYPTED_VARIABLES: {
+          secret: 'foo'
+        }
+      }
+
+      const result = await config.loadConfigFromObject(obj)
+
+      assert.deepStrictEqual(result, { secret: 'foo decrypted' })
+      assert.deepStrictEqual(config.getConfig(), { secret: 'foo decrypted' })
+    })
+
+    test('loads mix of plaintext, encrypted vars', async () => {
+      config = factory({
+        kmsDecrypter: () =>
+          Promise.resolve({ e: 'foo decrypted' })
+      })
+
+      const obj = {
+        PLAINTEXT_VARIABLES: {
+          p: 'plain'
+        },
+        ENCRYPTED_VARIABLES: {
+          e: 'foo'
+        }
+      }
+
+      const result = await config.loadConfigFromObject(obj)
+
+      assert.deepStrictEqual(result, {
+        p: 'plain',
+        e: 'foo decrypted'
+      })
+
+      assert.deepStrictEqual(config.getConfig(), {
+        p: 'plain',
+        e: 'foo decrypted'
+      })
+    })
+
+    test('works with empty object', async () => {
+      const obj = {}
+
+      const result = await config.loadConfigFromObject(obj)
+
+      assert.deepStrictEqual(result, {})
+      assert.deepStrictEqual(config.getConfig(), {})
     })
   })
 })
