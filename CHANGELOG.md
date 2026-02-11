@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.0.1] 2026-02-05
+## [1.0.1] 2026-02-11
 
  - Add `config.loadConfigFromObject`
 
