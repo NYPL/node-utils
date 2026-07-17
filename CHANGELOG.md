@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.2.0] 2026-07-17
+
+ - port NyplSourceMapper from RCI
+
 ## [1.0.1] 2026-02-11
 
  - Add `config.loadConfigFromObject`
