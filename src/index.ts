@@ -1,6 +1,6 @@
 import logger from './logger'
 import config from './config'
-import NyplSourceMapper from './source-mapper'
+import NyplSourceMapper from './nypl-source-mapper'
 
 export {
   logger,

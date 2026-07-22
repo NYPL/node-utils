@@ -8,7 +8,7 @@ import {
   mock
 } from 'node:test'
 
-import NyplSourceMapper from '../src/source-mapper'
+import NyplSourceMapper from '../src/nypl-source-mapper'
 import retryUtils from '../src/retry'
 
 const SOURCE_MAPPING_URL = 'https://raw.githubusercontent.com/NYPL/nypl-core/master/mappings/recap-discovery/nypl-source-mapping.json'

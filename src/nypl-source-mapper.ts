@@ -1,8 +1,6 @@
 import logger from './logger'
 import retryUtils from './retry'
 
-type NyplSource = 'sierra-nypl' | 'recap-pul' | 'recap-cul' | 'recap-hl'
-
 interface NyplSourceEntry {
   organization: string
   bibPrefix: string
@@ -30,7 +28,7 @@ class NyplSourceMapper {
   }
 
   /**
-   * Get singleton NyplSourceMapper instance
+   * Load singleton NyplSourceMapper instance with nypl core data
    */
   static loadInstance = async () => {
     logger.info('Loading nypl source mapping')
