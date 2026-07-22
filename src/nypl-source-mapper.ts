@@ -23,7 +23,7 @@ class NyplSourceMapper {
 
   static _instance: NyplSourceMapper | null = null
 
-  constructor (mapping: NyplSourceMapping) {
+  constructor (mapping: NyplSourceMapping, logger = null) {
     this.nyplSourceMap = mapping
   }
 
@@ -85,7 +85,7 @@ class NyplSourceMapper {
    *  Given an nypl source (such as sierra-nypl or recap-pul) returns the
    *  matching prefix
    */
-  prefix (source: NyplSource, type: 'bib' | 'item' | 'holding' = 'bib'): string {
+  prefix (source: string, type: 'bib' | 'item' | 'holding' = 'bib'): string {
     const nyplSourceMapping = this.nyplSourceMap
     if (!nyplSourceMapping[source]) return ''
     return nyplSourceMapping[source][`${type}Prefix` as keyof NyplSourceEntry] as string
