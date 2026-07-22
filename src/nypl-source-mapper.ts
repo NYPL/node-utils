@@ -121,4 +121,4 @@ const createInstance = async (): Promise<NyplSourceMapper> => {
 }
 
 export default NyplSourceMapper
-export type { NyplSourceMapping, NyplSourceEntry, NyplSource, SplitIdentifier }
+export type { NyplSourceMapping, NyplSourceEntry, SplitIdentifier }
