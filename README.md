@@ -80,3 +80,19 @@ const init = () => {
   logger.info('Something happened', { id: '...' })
 }
 ```
+
+### NyplSource mapper
+This module loads nypl core data and exposes methods to turn prefixed bnumbers into a bib id and nypl source, and vice versa. Since it is often used throughout an app, the async method which loads the data is separated from the synchronous method that returns the loaded instance. `loadInstance` is intended to be called in an app's initialization, and `instance()` in any module that requires nyplSource mapping.
+
+```
+const { NyplSourceMapper, config } = require('@nypl/node-utils')
+// or import { NyplSourceMapper, config } from '@nypl/node-utils'
+
+const init = () => {
+  await config.loadConfig()
+  await NyplSourceMapper.loadInstance()
+  const nyplSourceMapper = NyplSourceMapper.instance()
+  const { nyplSource, type, id } = nyplSourceMapper.splitIdentifier('b12345') 
+  // nyplSource = 'sierraNypl', type = 'bib', id = '12345'
+  const prefix = nyplSourceMapper.prefix('sierraNypl', 'bib') // returns 'b'
+}
