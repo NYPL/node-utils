@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.0.0] 2026-08-19
+
+- use async singleton loader for NyplSourceMapper
+
 ## [1.2.0] 2026-07-17
 
  - port NyplSourceMapper from RCI
