@@ -57,23 +57,21 @@ suite('NyplSourceMapper', () => {
     afterEach(() => NyplSourceMapper.__resetInstance())
 
     test('should fetch data from nypl core', async () => {
-      await NyplSourceMapper.loadInstance()
-      const mapping = NyplSourceMapper.instance()
+      const mapping = await NyplSourceMapper.instance()
       assert.strictEqual(mapping?.nyplSourceMap['sierra-nypl'].organization, 'nyplOrg:0001')
     })
 
     test('should return pre-fetched data if initialized', async () => {
       // We expect no fetches made yet:
       assert.strictEqual(interceptedNyplSourceMapperRequestsCount(), 0)
-      await NyplSourceMapper.loadInstance()
-      const mapping = NyplSourceMapper.instance()
+      const mapping = await NyplSourceMapper.instance()
       assert.strictEqual(mapping?.nyplSourceMap['sierra-nypl'].organization, 'nyplOrg:0001')
       // We expect one initial fetch made on the source mapper file
       assert.strictEqual(interceptedNyplSourceMapperRequestsCount(), 1)
 
       // Trigger another instance creation, which will break if another `fetch`
       // call is made, since instance() never re-fetches:
-      NyplSourceMapper.instance()
+      await NyplSourceMapper.instance()
       assert.strictEqual(mapping?.nyplSourceMap['sierra-nypl'].organization, 'nyplOrg:0001')
 
       // We expect no additional fetches made on the source mapper file:
@@ -81,12 +79,11 @@ suite('NyplSourceMapper', () => {
     })
 
     test('should reuse existing fetch if one is already active', async () => {
-      await NyplSourceMapper.loadInstance()
       // Trigger multiple instance creations simultaneously to assert the mock
       // is only used once:
       const [mapping1, mapping2] = [
-        NyplSourceMapper.instance(),
-        NyplSourceMapper.instance()
+        await NyplSourceMapper.instance(),
+        await NyplSourceMapper.instance()
       ]
       assert.strictEqual(mapping1?.nyplSourceMap['sierra-nypl'].organization, 'nyplOrg:0001')
       assert.strictEqual(mapping2?.nyplSourceMap['sierra-nypl'].organization, 'nyplOrg:0001')
@@ -98,8 +95,7 @@ suite('NyplSourceMapper', () => {
 
     beforeEach(async () => {
       stubNyplSourceMapper()
-      await NyplSourceMapper.loadInstance()
-      sourceMapperInstance = NyplSourceMapper.instance() as NyplSourceMapper
+      sourceMapperInstance = await NyplSourceMapper.instance() as NyplSourceMapper
     })
     afterEach(() => NyplSourceMapper.__resetInstance())
 
@@ -187,8 +183,7 @@ suite('NyplSourceMapper', () => {
 
     before(async () => {
       stubNyplSourceMapper()
-      await NyplSourceMapper.loadInstance()
-      sourceMapperInstance = NyplSourceMapper.instance() as NyplSourceMapper
+      sourceMapperInstance = await NyplSourceMapper.instance() as NyplSourceMapper
     })
 
     test('should get correct prefix for sierra-nypl', () => {
@@ -227,7 +222,7 @@ suite('NyplSourceMapper', () => {
       }))
 
       await assert.rejects(
-        () => NyplSourceMapper.loadInstance(),
+        () => NyplSourceMapper.instance(),
         { message: 'Exhausted 3 retries: got status 503' }
       )
     })
@@ -240,7 +235,7 @@ suite('NyplSourceMapper', () => {
       }))
 
       await assert.rejects(
-        () => NyplSourceMapper.loadInstance(),
+        () => NyplSourceMapper.instance(),
         { message: `Error parsing data at ${SOURCE_MAPPING_URL}` }
       )
     })
