@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.0.1] 2026-08-20
+
+- move NyplSourceMapper log
+
 ## [2.0.0] 2026-08-19
 
 - use async singleton loader for NyplSourceMapper
