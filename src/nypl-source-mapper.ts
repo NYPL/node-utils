@@ -31,8 +31,8 @@ class NyplSourceMapper {
    * Load singleton NyplSourceMapper instance with nypl core data
    */
   static instance = async (): Promise<NyplSourceMapper> => {
-    logger.info("Loading nypl source mapping");
     if (NyplSourceMapper._instance === null) {
+      logger.info("Loading nypl source mapping");
       NyplSourceMapper._instance = await createInstance();
     }
     return NyplSourceMapper._instance
