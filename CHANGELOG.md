@@ -1,6 +1,6 @@
 # Changelog
 
-## [2.0.1] 2026-08-20
+## [2.0.2] 2026-08-20
 
 - move NyplSourceMapper log
 
